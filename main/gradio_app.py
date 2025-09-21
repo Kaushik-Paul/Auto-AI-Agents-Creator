@@ -195,12 +195,26 @@ def create_interface():
 
         # Custom CSS for the app
         demo.css = """
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800&family=Sora:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap');
-        html, body { background: #0b1220; color: #e2e8f0; font-family: Sora, Inter, Helvetica, Arial, sans-serif; overflow-x: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800&family=Manrope:wght@400;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+        html, body { background: #0b1220; color: #e2e8f0; font-family: Manrope, Inter, Helvetica, Arial, sans-serif; overflow-x: hidden; }
         .gradio-container { max-width: 100% !important; width: 100% !important; margin: 0 auto !important; padding: 0 16px; }
         .header { max-width: 100%; margin: 24px auto 8px; padding: 12px 16px; text-align: center; }
-        .brand { font-family: Space Grotesk, Sora, Inter, sans-serif; font-weight: 800; font-size: 40px; letter-spacing: .3px; background: linear-gradient(90deg,#06b6d4 0%,#a78bfa 45%,#fb7185 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 36px rgba(167,139,250,.35); }
-        .subtitle { color: #cbd5e1; margin-top: 10px; font-weight: 700; letter-spacing: .2px; max-width: 880px; margin-left: auto; margin-right: auto; display: block; }
+        .brand { font-family: Space Grotesk, Manrope, Inter, sans-serif; font-weight: 800; font-size: 40px; letter-spacing: .3px; background: linear-gradient(90deg,#06b6d4 0%,#a78bfa 45%,#fb7185 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 36px rgba(167,139,250,.35); }
+        .subtitle { 
+            margin: 8px auto 12px;
+            font-weight: 500;
+            font-family: 'Manrope', sans-serif;
+            letter-spacing: 0.03em;
+            line-height: 1.6;
+            max-width: 720px;
+            text-align: center;
+            font-size: 1.1rem;
+            background: linear-gradient(90deg, #06b6d4 0%, #a78bfa 50%, #fb7185 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 8px rgba(167,139,250,0.3);
+        }
         .section-title { color: #93c5fd; }
         .card { border: 1px solid rgba(148,163,184,.18); border-radius: 14px; padding: 10px; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)); box-shadow: 0 6px 18px rgba(0,0,0,.28); backdrop-filter: blur(4px); }
         #run-btn { background: linear-gradient(90deg,#06b6d4,#a78bfa,#fb7185); color: white; padding: 12px 24px; font-size: 16px; border-radius: 10px; border: none; transition: transform .15s ease, opacity .2s ease; }
