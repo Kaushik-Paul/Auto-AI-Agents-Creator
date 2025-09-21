@@ -2,6 +2,7 @@ import importlib
 import os
 import sys
 import logging
+import json
 from dotenv import load_dotenv
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
@@ -76,7 +77,16 @@ class Creator(RoutedAgent):
 
     @message_handler
     async def handle_my_message_type(self, message: messages.Message, ctx: MessageContext) -> messages.Message:
+        # Support both legacy plain filename and JSON payload with {"filename", "prompt"}
         filename = message.content
+        prompt = "Give me an idea"
+        try:
+            parsed = json.loads(message.content)
+            if isinstance(parsed, dict):
+                filename = parsed.get("filename", filename)
+                prompt = parsed.get("prompt", prompt)
+        except Exception:
+            pass
         agent_name = filename.split(".")[0]
         text_message = TextMessage(content=self.get_user_prompt(), source="user")
         response = await self._delegate.on_messages([text_message], ctx.cancellation_token)
@@ -84,7 +94,13 @@ class Creator(RoutedAgent):
             f.write(response.chat_message.content)
         print(f"** Creator has created python code for agent {agent_name} - about to register with Runtime")
         module = importlib.import_module(f"main.{agent_name}")
+        # Ensure generated Agent uses the provided prompt as its system_message
+        try:
+            setattr(module.Agent, "system_message", prompt)
+        except Exception:
+            pass
         await module.Agent.register(self.runtime, agent_name, lambda: module.Agent(agent_name))
         logger.info(f"** Agent {agent_name} is live")
-        result = await self.send_message(messages.Message(content="Give me an idea"), AgentId(agent_name, "default"))
+        # Use the provided prompt to message the new Agent
+        result = await self.send_message(messages.Message(content=prompt), AgentId(agent_name, "default"))
         return messages.Message(content=result.content)
