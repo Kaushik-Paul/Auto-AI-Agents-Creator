@@ -17,7 +17,6 @@ from main import messages
 from main.upload_to_gcp import upload_to_gcp
 from main import constants
 
-
 HOW_MANY_AGENTS = constants.TOTAL_AGENTS_CREATED_SIMULTANEOUSLY
 
 
