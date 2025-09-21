@@ -15,9 +15,10 @@ from autogen_core import AgentId
 from main.creator import Creator
 from main import messages
 from main.upload_to_gcp import upload_to_gcp
+from main import constants
 
 
-HOW_MANY_AGENTS = 10
+HOW_MANY_AGENTS = constants.TOTAL_AGENTS_CREATED_SIMULTANEOUSLY
 
 
 async def _create_and_message(worker: GrpcWorkerAgentRuntime, creator_id: AgentId, i: int, prompt: str):
