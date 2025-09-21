@@ -67,8 +67,9 @@ def run_pipeline_wrapper(agent_prompt: str):
             last_pct = pct
             filled = int(bar_len * pct / 100)
             bar = ("█" * filled) + ("░" * (bar_len - filled))
+            status = "Generating agents…" if elapsed < (total / 2.0) else "Creating ideas…"
             yield (
-                gr.update(value=f"[{bar}] {pct}% - Generating agents…", visible=True),
+                gr.update(value=f"[{bar}] {pct}% - {status}", visible=True),
                 gr.update(visible=False),  # Keep results_col hidden during processing
                 gr.update(visible=False),
                 gr.update(visible=False),
@@ -106,8 +107,12 @@ def create_interface():
     with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo")) as demo:
         # Header
         with gr.Row(elem_classes=["header"]):
-            gr.Markdown("# 🚀 Auto AI Agents Creator", elem_classes=["brand"])
-            gr.Markdown("Generate AI agents with a single prompt", elem_classes=["subtitle"])
+            with gr.Column():
+                gr.Markdown("# 🚀 Auto AI Agents Creator", elem_classes=["brand"])
+                gr.Markdown(
+                    "Let AI spin up a smart team of agents that talk to each other and execute tasks crafted for your needs.",
+                    elem_classes=["subtitle"],
+                )
 
         # Main content
         with gr.Row():
@@ -136,8 +141,10 @@ def create_interface():
         with gr.Row(elem_classes=["progress-container"]):
             progress_md = gr.Markdown(
                 value="",
-                elem_classes=["card", "markdown-white", "progress-text"],
+                elem_classes=["progress-text"],
                 visible=False,
+                container=False,
+                elem_id="progress_md",
             )
 
         # Results below the button, initially hidden
@@ -150,6 +157,7 @@ def create_interface():
                         placeholder="Agents will appear here after generation...",
                         interactive=False,
                         elem_classes=["card"],
+                        show_copy_button=True,
                     )
                 with gr.Column(scale=1):
                     gr.Markdown("### Generated Ideas", elem_classes=["section-title"])
@@ -158,13 +166,16 @@ def create_interface():
                         placeholder="Ideas will appear here after generation...",
                         interactive=False,
                         elem_classes=["card"],
+                        show_copy_button=True,
                     )
 
             with gr.Row():
                 last_idea_md = gr.Markdown(
                     value="",
-                    elem_classes=["card", "markdown-white"],
+                    elem_classes=[],
                     visible=False,
+                    container=False,
+                    elem_id="last_idea_md",
                 )
 
         # Connect the button to the pipeline
@@ -184,23 +195,37 @@ def create_interface():
 
         # Custom CSS for the app
         demo.css = """
-        html, body { background: #0b1220; color: #e2e8f0; font-family: Inter, Helvetica, Arial, sans-serif; overflow-x: hidden; }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800&family=Sora:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap');
+        html, body { background: #0b1220; color: #e2e8f0; font-family: Sora, Inter, Helvetica, Arial, sans-serif; overflow-x: hidden; }
         .gradio-container { max-width: 100% !important; width: 100% !important; margin: 0 auto !important; padding: 0 16px; }
         .header { max-width: 100%; margin: 24px auto 8px; padding: 12px 16px; text-align: center; }
-        .brand { font-weight: 900; font-size: 36px; background: linear-gradient(90deg,#2563eb,#7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 2px 28px rgba(37,99,235,.45); }
-        .subtitle { color: #cbd5e1; margin-top: 8px; font-weight: 600; }
-        .section-title { color: #a5b4fc; }
-        .card { border: 1px solid rgba(148,163,184,.2); border-radius: 12px; padding: 10px; background: rgba(2,6,23,.5); box-shadow: 0 4px 14px rgba(0,0,0,.25); }
-        #run-btn { background: linear-gradient(90deg,#2563eb,#7c3aed); color: white; padding: 12px 24px; font-size: 16px; border-radius: 10px; border: none; transition: transform .15s ease, opacity .2s ease; }
+        .brand { font-family: Space Grotesk, Sora, Inter, sans-serif; font-weight: 800; font-size: 40px; letter-spacing: .3px; background: linear-gradient(90deg,#06b6d4 0%,#a78bfa 45%,#fb7185 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 4px 36px rgba(167,139,250,.35); }
+        .subtitle { color: #cbd5e1; margin-top: 10px; font-weight: 700; letter-spacing: .2px; max-width: 880px; margin-left: auto; margin-right: auto; display: block; }
+        .section-title { color: #93c5fd; }
+        .card { border: 1px solid rgba(148,163,184,.18); border-radius: 14px; padding: 10px; background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)); box-shadow: 0 6px 18px rgba(0,0,0,.28); backdrop-filter: blur(4px); }
+        #run-btn { background: linear-gradient(90deg,#06b6d4,#a78bfa,#fb7185); color: white; padding: 12px 24px; font-size: 16px; border-radius: 10px; border: none; transition: transform .15s ease, opacity .2s ease; }
         #run-btn:hover:not(:disabled) { transform: translateY(-1px); }
         #run-btn:disabled { cursor: not-allowed !important; opacity: .7 !important; }
         .center-row { display: flex; justify-content: center; }
         /* Center the progress bar and text */
-        .progress-container { display: flex; justify-content: center; width: 100%; margin: 10px 0; }
-        .progress-text { text-align: center; width: 100%; font-family: monospace; letter-spacing: 0.5px; }
-        /* Make markdown readable on white */
-        .markdown-white { background: #ffffff !important; color: #0b1220 !important; border-radius: 8px; }
-        .markdown-white * { color: #0b1220 !important; }
+        .progress-container { display: grid; grid-template-columns: 1fr; justify-items: stretch; width: 100%; margin: 10px 0; gap: 0; }
+        .md-container { display: grid; grid-template-columns: 1fr; justify-items: stretch; width: 100%; gap: 0; }
+        .progress-container > *, .md-container > * { grid-column: 1 / -1; width: 100%; }
+        #progress_md, #last_idea_md { width: 100%; }
+        #progress_md > div, #last_idea_md > div { background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+        .progress-text, .progress-pre { text-align: center; width: 100%; font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; letter-spacing: 0.5px; }
+        .progress-pre { background: transparent; color: #0b1220; margin: 0; white-space: pre; }
+        /* Single white card used by HTML templates */
+        .single-card { background: #ffffff; color: #0b1220; border-radius: 12px; border: 1px solid rgba(148,163,184,.2); box-shadow: 0 6px 18px rgba(0,0,0,.16); padding: 14px; width: 100%; display: block; background-clip: padding-box; overflow: hidden; }
+        #progress_md .single-card, #last_idea_md .single-card { width: 100%; display: block; box-sizing: border-box; overflow: hidden; }
+        .md-body { line-height: 1.65; }
+        .md-body h1, .md-body h2, .md-body h3 { color: #0f172a; margin: 12px 0; font-family: Manrope, Inter, sans-serif; }
+        .md-body h1 { font-size: 28px; }
+        .md-body h2 { font-size: 22px; }
+        .md-body h3 { font-size: 18px; }
+        .md-body p { margin: 10px 0; }
+        .md-body ul { padding-left: 20px; }
+        .md-body li { margin: 4px 0; }
         """
         
         demo.queue()
