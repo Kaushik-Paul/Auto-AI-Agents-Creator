@@ -12,6 +12,7 @@ from autogen_core import AgentId
 
 from main import messages
 from main.creator import Creator
+from main.upload_to_gcp import upload_to_gcp
 
 HOW_MANY_AGENTS = 10
 
@@ -40,3 +41,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+    signed_url = upload_to_gcp()
+    print(signed_url)
+
