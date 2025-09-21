@@ -160,12 +160,11 @@ __Important warnings when increasing the agent count:__
   - `main/agent.py` lines 30–36 — Template agent’s system message
 
 ## Outputs & Cloud Uploads
-- On completion, the app creates two archives and uploads them to your GCS bucket:
-  - `ideas/ideas-<UTC_TIMESTAMP>.zip` — all `idea*.md` files
-  - `auto-agents/auto-agents-<UTC_TIMESTAMP>.zip` — all generated `agent*.py` files (excluding the template `agent.py`)
-- Both archives share the same UTC timestamp in their names.
-- Signed URLs are generated (V4, 10-minute expiration by default) and shown in the UI.
-- Local `idea*.md` and generated `agent*.py` files are deleted after upload.
+- The app generates two downloadable archives:
+  - A zip file containing all generated ideas (Markdown format)
+  - A zip file containing the Python code for all generated agents
+- Both files are uploaded to Google Cloud Storage and accessible via time-limited signed URLs
+- Local temporary files are automatically cleaned up after upload
 
 ## Deployment
 - The project is deployed here: https://huggingface.co/spaces/kaushikpaul/Auto-AI-Agents-Creator
