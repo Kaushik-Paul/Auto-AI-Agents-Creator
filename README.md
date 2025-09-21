@@ -4,7 +4,7 @@
 
 Create multiple AI agents in parallel, let them generate ideas, and get downloadable artifacts — all from a simple Gradio UI.
 
-This project is powered by Microsoft Autogen (AgentChat + Core + gRPC runtime), not CrewAI. It spins up a Creator agent that generates new agent classes on the fly, registers them with a lightweight gRPC runtime, messages them with your prompt, and packages outputs to Google Cloud Storage (GCS) with signed download links.
+This project is powered by Microsoft Autogen (AgentChat + Core + gRPC runtime). It spins up a Creator agent that generates new agent classes on the fly, registers them with a lightweight gRPC runtime, messages them with your prompt, and packages outputs to Google Cloud Storage (GCS) with signed download links.
 
 ## Live Demo
 - Visit the hosted Space: https://huggingface.co/spaces/kaushikpaul/Auto-AI-Agents-Creator
