@@ -36,7 +36,7 @@ def run_pipeline_wrapper(agent_prompt: str):
     filled = int(bar_len * pct / 100)
     bar = ("█" * filled) + ("░" * (bar_len - filled))
     yield (
-        gr.update(value=f"[{bar}] {pct}% - Running pipeline…", visible=True),
+        gr.update(value=f"[{bar}] {pct}% - Generating agents…", visible=True),
         gr.update(visible=False),  # results_col - initially hidden
         gr.update(value="", visible=False),   # agents_url_box
         gr.update(value="", visible=False),   # ideas_url_box
@@ -68,7 +68,7 @@ def run_pipeline_wrapper(agent_prompt: str):
             filled = int(bar_len * pct / 100)
             bar = ("█" * filled) + ("░" * (bar_len - filled))
             yield (
-                gr.update(value=f"[{bar}] {pct}% - Running pipeline…", visible=True),
+                gr.update(value=f"[{bar}] {pct}% - Generating agents…", visible=True),
                 gr.update(visible=False),  # Keep results_col hidden during processing
                 gr.update(visible=False),
                 gr.update(visible=False),
@@ -98,7 +98,7 @@ def run_pipeline_wrapper(agent_prompt: str):
         gr.update(value=agents_url_valid, visible=bool(agents_url_valid)),  # agents_url_box
         gr.update(value=ideas_url_valid, visible=bool(ideas_url_valid)),    # ideas_url_box
         gr.update(value=_safe_markdown(last_idea_md), visible=bool(last_idea_md)),  # last_idea_md
-        gr.update(interactive=True, value="Run Pipeline")  # run_btn
+        gr.update(interactive=True, value="Auto generate agents")  # run_btn
     )
 
 def create_interface():
