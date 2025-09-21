@@ -2,7 +2,7 @@
 
 [![Live Demo – Hugging Face Space](https://img.shields.io/badge/Live%20Demo-Hugging%20Face%20Space-yellow?logo=huggingface&logoColor=white)](https://huggingface.co/spaces/kaushikpaul/Auto-AI-Agents-Creator)
 
-Create multiple AI agents in parallel, let them generate ideas, and get downloadable artifacts — all from a simple Gradio UI.
+An AI-powered agent factory where multiple AI agents collaborate to generate and refine ideas. Watch as these agents work in parallel, discuss concepts, and produce unique insights — all accessible through an intuitive Gradio interface.
 
 This project is powered by Microsoft Autogen (AgentChat + Core + gRPC runtime). It spins up a Creator agent that generates new agent classes on the fly, registers them with a lightweight gRPC runtime, messages them with your prompt, and packages outputs to Google Cloud Storage (GCS) with signed download links.
 
