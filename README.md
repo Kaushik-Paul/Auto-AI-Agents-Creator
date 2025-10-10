@@ -1,13 +1,13 @@
 # Auto AI Agents Creator
 
-[![Live Website](https://img.shields.io/badge/Live_Website-6c63ff?logo=rocket&logoColor=white&labelColor=5a52d3)](https://projects.kaushikpaul.pp.ua/auto-ai-agents)
+[![Live Website](https://img.shields.io/badge/Live_Website-6c63ff?logo=rocket&logoColor=white&labelColor=5a52d3)](https://projects.kaushikpaul.co.in/auto-ai-agents)
 
 An AI-powered agent factory where multiple AI agents collaborate to generate and refine ideas. Watch as these agents work in parallel, discuss concepts, and produce unique insights — all accessible through an intuitive Gradio interface.
 
 This project is powered by Microsoft Autogen (AgentChat + Core + gRPC runtime). It spins up a Creator agent that generates new agent classes on the fly, registers them with a lightweight gRPC runtime, messages them with your prompt, and packages outputs to Google Cloud Storage (GCS) with signed download links.
 
 ## Live Demo
-- [Visit the Live Website](https://projects.kaushikpaul.pp.ua/auto-ai-agents)
+- [Visit the Live Website](https://projects.kaushikpaul.co.in/auto-ai-agents)
 
 ## Features
 - __Multi-agent generation (Autogen)__
@@ -167,7 +167,7 @@ __Important warnings when increasing the agent count:__
 - Local temporary files are automatically cleaned up after upload
 
 ## Deployment
-- The project is deployed here: [Live Website](https://projects.kaushikpaul.pp.ua/auto-ai-agents)
+- The project is deployed here: [Live Website](https://projects.kaushikpaul.co.in/auto-ai-agents)
 
 To deploy your own Space:
 - Create a new Space (SDK: Gradio)
