@@ -19,7 +19,8 @@ This project is powered by Microsoft Autogen (AgentChat + Core + gRPC runtime). 
 - __Artifact delivery via GCS__
   - Zips are uploaded to GCS and returned as time-limited signed URLs. Local source files are cleaned up automatically.
 - __Model-flexible__
-  - Uses OpenRouter-hosted models via an OpenAI-compatible client. Model and base URL are set in `main/constants.py`.
+  - Switches between OpenRouter and OpenCode Go from environment variables.
+  - OpenCode Go automatically tries OpenAI-compatible chat completions and Anthropic-style messages for models such as MiniMax M2.7.
 
 ## Architecture Overview
 - __UI__: `main/gradio_app.py` (entry launched by `main/app.py`)
@@ -29,13 +30,13 @@ This project is powered by Microsoft Autogen (AgentChat + Core + gRPC runtime). 
   - Template agent: `main/agent.py`
   - Creator agent (generates agents on the fly): `main/creator.py`
 - __Cloud upload__: `main/upload_to_gcp.py` (bundles and uploads artifacts to GCS, returns signed URLs)
-- __Configuration__: `main/constants.py` (OpenRouter base URL, model, number of agents)
+- __Configuration__: environment variables for provider/model selection, plus `main/constants.py` for agent count
 
 ## Prerequisites
 - Python 3.10+
 - A modern browser
 - Accounts/keys:
-  - OpenRouter API key (for model access)
+  - OpenRouter or OpenCode Go API key (for model access)
   - Google Cloud Platform project, bucket, and service account with storage permissions
 
 ## Quick Start
@@ -80,8 +81,19 @@ pip install -r requirements.txt
 Create a `.env` file in the project root:
 
 ```ini
-# ——— OpenRouter (LLM provider via OpenAI-compatible client) ———
+# ——— LLM provider switch ———
+# Use OpenRouter when true; use OpenCode Go when false.
+USE_OPENROUTER=false
+
+# ——— OpenRouter (OpenAI-compatible) ———
 OPENROUTER_API_KEY=your_openrouter_key
+OPENROUTER_MODEL=x-ai/grok-4-fast:free
+
+# ——— OpenCode Go ———
+OPENCODE_GO_API_KEY=your_opencode_go_key
+OPENCODE_GO_MODEL=minimax-m2.7
+# Optional: auto, openai, or anthropic. Keep auto unless debugging.
+OPENCODE_GO_API_STYLE=auto
 
 # ——— Google Cloud Storage (used by upload_to_gcp.py) ———
 GCP_PROJECT_ID=your_gcp_project_id
@@ -91,8 +103,9 @@ GCP_SERVICE_KEY=base64_encoded_service_account_json
 ```
 
 Notes:
-- The base URL and model for OpenRouter are configured in `main/constants.py`.
-- `creator.py` loads `.env` automatically via `python-dotenv`.
+- Models come from `.env` or Hugging Face Space secrets; provider base URLs are constants in `main/constants.py`.
+- `USE_OPENROUTER=false` selects OpenCode Go; `USE_OPENROUTER=true` selects OpenRouter.
+- MiniMax M2.7 uses the Anthropic-style `/messages` endpoint; the OpenCode client handles that automatically when `OPENCODE_GO_API_STYLE=auto`.
 
 ### 5) Run locally
 ```bash
@@ -137,12 +150,16 @@ This implementation demonstrates how Autogen can be used to create sophisticated
 
 ## Configuration
 
-### LLM Provider (OpenRouter)
-- File: `main/constants.py`
-  - `OPENROUTER_BASE_URL` (default: `https://openrouter.ai/api/v1`)
-  - `OPENROUTER_MODEL` (e.g., `x-ai/grok-4-fast:free`)
-- File: `main/creator.py`
-  - Uses `OpenAIChatCompletionClient` with the base URL and API key from above.
+### LLM Provider
+- `USE_OPENROUTER=true`
+  - Uses `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`.
+- `USE_OPENROUTER=false`
+  - Uses `OPENCODE_GO_API_KEY` and `OPENCODE_GO_MODEL`.
+  - `OPENCODE_GO_API_STYLE=auto` lets the app switch between OpenAI-compatible `/chat/completions` and Anthropic-style `/messages` as needed.
+- Base URLs are defined in `main/constants.py`:
+  - `OPENROUTER_BASE_URL`
+  - `OPENCODE_GO_OPENAI_BASE_URL`
+  - `OPENCODE_GO_ANTHROPIC_BASE_URL`
 
 ### Number of Agents (Concurrency)
 - File: `main/constants.py`
@@ -173,15 +190,19 @@ To deploy your own Space:
 - Create a new Space (SDK: Gradio)
 - Point the Space to run `python -m main.app` (or equivalent) as the entry
 - Configure Secrets in the Space settings:
-  - `OPENROUTER_API_KEY`
+  - `USE_OPENROUTER`
+  - `OPENROUTER_API_KEY`, `OPENROUTER_MODEL` if using OpenRouter
+  - `OPENCODE_GO_API_KEY`, `OPENCODE_GO_MODEL` if using OpenCode Go
   - `GCP_PROJECT_ID`, `GCP_BUCKET_NAME`, `GCP_SERVICE_KEY`
 - Ensure the Python version is compatible with the versions in `requirements.txt`.
 
 ## Troubleshooting
 - __Missing or invalid GCP variables__
   - Ensure `GCP_PROJECT_ID`, `GCP_BUCKET_NAME`, and a valid base64 `GCP_SERVICE_KEY` (service account JSON) are set.
-- __OpenRouter authentication__
-  - Confirm `OPENROUTER_API_KEY` is present and the selected `OPENROUTER_MODEL` in `main/constants.py` is accessible to your account.
+- __Provider authentication__
+  - Confirm `USE_OPENROUTER` is set as intended.
+  - For OpenRouter, confirm `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` are valid.
+  - For OpenCode Go, confirm `OPENCODE_GO_API_KEY` and `OPENCODE_GO_MODEL` are valid.
 - __No URLs returned__
   - If there were no generated files or the upload failed, signed URLs may be empty. Check logs and GCP permissions.
 - __Port conflicts__

@@ -19,7 +19,7 @@ def _get_gcp_credentials():
             "Missing one or more GCP environment variables: "
             "GCP_PROJECT_ID, GCP_BUCKET_NAME, GCP_SERVICE_KEY"
         )
-    
+
     service_key = json.loads(base64.b64decode(gcp_service_key).decode("utf-8"))
     return project_id, bucket_name, service_account.Credentials.from_service_account_info(service_key)
 
@@ -46,16 +46,16 @@ def _upload_and_cleanup(bucket, file_paths, blob_prefix, zip_basename, timestamp
 
     if not file_paths:
         return None
-        
+
     # Create zip
     zip_path = _create_zip(f"{zip_basename}-{timestamp}", file_paths)
-    
+
     try:
         # Upload to GCS
         blob_name = f"{blob_prefix}/{os.path.basename(zip_path)}"
         blob = bucket.blob(blob_name)
         blob.upload_from_filename(zip_path)
-        
+
         # Generate signed URL
         signed_url = blob.generate_signed_url(
             version="v4",
@@ -83,17 +83,17 @@ def upload_to_gcp():
 
     # Shared timestamp for both archives (UTC for determinism)
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
-    
+
     # Initialize GCP client
     project_id, bucket_name, credentials = _get_gcp_credentials()
     client = _get_storage_client(project_id, credentials)
     bucket = client.get_bucket(bucket_name)
-    
+
     # Process ideas
     ideas_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../ideas"))
     idea_files = sorted(glob.glob(os.path.join(ideas_dir, "idea*.md"))) \
         if os.path.isdir(ideas_dir) else []
-    
+
     ideas_signed_url = _upload_and_cleanup(
         bucket=bucket,
         file_paths=idea_files,
@@ -101,14 +101,14 @@ def upload_to_gcp():
         zip_basename="ideas",
         timestamp=timestamp
     )
-    
+
     # Process agents
     main_dir = os.path.abspath(os.path.dirname(__file__))
     agent_files = [
         fp for fp in glob.glob(os.path.join(main_dir, "agent*.py"))
         if os.path.basename(fp) != "agent.py"
     ]
-    
+
     agents_signed_url = _upload_and_cleanup(
         bucket=bucket,
         file_paths=agent_files,
@@ -116,7 +116,7 @@ def upload_to_gcp():
         zip_basename="auto-agents",
         timestamp=timestamp
     )
-    
+
     return {
         "ideas_signed_url": ideas_signed_url,
         "agents_signed_url": agents_signed_url,
