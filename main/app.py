@@ -11,7 +11,8 @@ if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
 from main.gradio_app import create_interface
+import gradio as gr
 
 if __name__ == "__main__":
     interface = create_interface()
-    interface.launch()
+    interface.launch(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo"))
