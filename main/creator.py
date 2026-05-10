@@ -3,7 +3,6 @@ import os
 import sys
 import logging
 import json
-from dotenv import load_dotenv
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 if root_dir not in sys.path:
@@ -12,23 +11,16 @@ if root_dir not in sys.path:
 from autogen_core import MessageContext, RoutedAgent, message_handler
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.messages import TextMessage
-from autogen_ext.models.openai import OpenAIChatCompletionClient
 from autogen_core import TRACE_LOGGER_NAME
 from autogen_core import AgentId
 
 from main import messages
-from main import constants
-
-load_dotenv(override=True)
+from main.model_client import create_model_client
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(TRACE_LOGGER_NAME)
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG)
-
-openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
-OPENROUTER_BASE_URL = constants.OPENROUTER_BASE_URL
-openrouter_model = constants.OPENROUTER_MODEL
 
 
 class Creator(RoutedAgent):
@@ -50,19 +42,7 @@ class Creator(RoutedAgent):
 
     def __init__(self, name) -> None:
         super().__init__(name)
-        model_client = OpenAIChatCompletionClient(
-            model=openrouter_model,
-            base_url=OPENROUTER_BASE_URL,
-            api_key=openrouter_api_key,
-            model_info={
-                "family": "xAI",
-                "vision": True,
-                "json_output": True,
-                "function_calling": True,
-                "structured_output": True
-            },
-            temperature=1.0
-        )
+        model_client = create_model_client(temperature=1.0)
         self._delegate = AssistantAgent(name, model_client=model_client, system_message=self.system_message)
 
     def get_user_prompt(self):

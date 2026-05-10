@@ -1,6 +1,5 @@
 import os
 import random
-from dotenv import load_dotenv
 import sys
 
 root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
@@ -10,16 +9,9 @@ if root_dir not in sys.path:
 from autogen_core import MessageContext, RoutedAgent, message_handler
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.messages import TextMessage
-from autogen_ext.models.openai import OpenAIChatCompletionClient
 
 from main import messages
-from main import constants
-
-load_dotenv(override=True)
-
-openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
-OPENROUTER_BASE_URL = constants.OPENROUTER_BASE_URL
-openrouter_model = constants.OPENROUTER_MODEL
+from main.model_client import create_model_client
 
 
 class Agent(RoutedAgent):
@@ -42,19 +34,7 @@ class Agent(RoutedAgent):
 
     def __init__(self, name) -> None:
         super().__init__(name)
-        model_client = OpenAIChatCompletionClient(
-            model=openrouter_model,
-            base_url=OPENROUTER_BASE_URL,
-            api_key=openrouter_api_key,
-            model_info={
-                "family": "xAI",
-                "vision": True,
-                "json_output": True,
-                "function_calling": True,
-                "structured_output": True
-            },
-            temperature=0.7
-        )
+        model_client = create_model_client(temperature=0.7)
         self._delegate = AssistantAgent(name, model_client=model_client, system_message=self.system_message)
 
     @message_handler
