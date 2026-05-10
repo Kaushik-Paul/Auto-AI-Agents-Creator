@@ -9,7 +9,7 @@ dependencies = [
     "autogen-core==0.7.5",
     "autogen-ext[anthropic,grpc,openai]==0.7.5",
     "google-cloud-storage==3.3.1",
-    "gradio==5.46.1",
+    "gradio==6.13.0",
     "python-dotenv==1.2.1",
 ]
 

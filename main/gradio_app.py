@@ -104,7 +104,7 @@ def run_pipeline_wrapper(agent_prompt: str):
 
 def create_interface():
     """Create and return the Gradio interface."""
-    with gr.Blocks(theme=gr.themes.Soft(primary_hue="blue", secondary_hue="indigo")) as demo:
+    with gr.Blocks() as demo:
         # Header
         with gr.Row(elem_classes=["header"]):
             with gr.Column():
@@ -157,7 +157,7 @@ def create_interface():
                         placeholder="Agents will appear here after generation...",
                         interactive=False,
                         elem_classes=["card"],
-                        show_copy_button=True,
+                        buttons=["copy"],
                     )
                 with gr.Column(scale=1):
                     gr.Markdown("### Generated Ideas", elem_classes=["section-title"])
@@ -166,7 +166,7 @@ def create_interface():
                         placeholder="Ideas will appear here after generation...",
                         interactive=False,
                         elem_classes=["card"],
-                        show_copy_button=True,
+                        buttons=["copy"],
                     )
 
             with gr.Row():

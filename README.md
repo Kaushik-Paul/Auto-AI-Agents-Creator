@@ -196,6 +196,14 @@ To deploy your own Space:
   - `GCP_PROJECT_ID`, `GCP_BUCKET_NAME`, `GCP_SERVICE_KEY`
 - Ensure the Python version is compatible with the versions in `requirements.txt`.
 
+Deploy from this repo with:
+
+```bash
+uv run python scripts/deploy_space.py
+```
+
+This uses the Hugging Face Hub API with an allow-list so local folders like `.venv/` are not uploaded. Avoid running `gradio deploy` from the repo root because Gradio uploads the whole folder and can include the local virtual environment.
+
 ## Troubleshooting
 - __Missing or invalid GCP variables__
   - Ensure `GCP_PROJECT_ID`, `GCP_BUCKET_NAME`, and a valid base64 `GCP_SERVICE_KEY` (service account JSON) are set.
